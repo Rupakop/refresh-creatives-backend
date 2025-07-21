@@ -1,51 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-dotenv.config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
-
-// ✅ Replace with your actual deployed frontend URL
-const FRONTEND_URL = 'https://refresh-creatives.vercel.app';
-
-app.use(cors({
-  origin: FRONTEND_URL
-}));
+app.use(cors());
 app.use(express.json());
 
-// ✅ Replace with your MongoDB connection string in the .env file
+// test route
+app.get("/api", (req, res) => {
+  res.send("Backend is working");
+});
+
+// connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
-
-// 🛒 Order Schema
-const orderSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  address: String,
-  products: Array
-});
-
-const Order = mongoose.model('Order', orderSchema);
-
-// 📦 Order API Endpoint
-app.post('/api/orders', async (req, res) => {
-  try {
-    const order = new Order(req.body);
-    await order.save();
-    res.status(201).json({ message: 'Order placed successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error placing order' });
-  }
-});
-
-// 🚀 Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log("Connected to MongoDB");
+  app.listen(process.env.PORT || 5000, () => {
+    console.log("Server started on port 5000");
+  });
+}).catch(err => console.error("MongoDB error:", err));
